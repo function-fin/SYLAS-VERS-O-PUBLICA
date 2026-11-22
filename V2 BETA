@@ -9,7 +9,6 @@ local function isAuthorized()
     return LocalPlayer and LocalPlayer.UserId == AUTHORIZED_USER_ID
 end
 
--- Interface de aviso (PrivateFunctionAlertUI) com prioridade máxima
 local function showPrivateAlert()
     local CoreGui = game:GetService("CoreGui")
     local parent = (pcall(function() return CoreGui.Name end) and CoreGui) or LocalPlayer:WaitForChild("PlayerGui")
@@ -25,7 +24,7 @@ local function showPrivateAlert()
     ScreenGui.Name = "PrivateFunctionAlertUI"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.DisplayOrder = 999          -- prioridade sobre o menu principal
+    ScreenGui.DisplayOrder = 999
     ScreenGui.Parent = parent
 
     local MainFrame = Instance.new("Frame")
@@ -77,16 +76,16 @@ local function showPrivateAlert()
 
     local MessageLabel = Instance.new("TextLabel")
     MessageLabel.Name = "MessageLabel"
-    MessageLabel.Size = UDim2.new(1, -s(24), 0, s(68))
+    MessageLabel.Size = UDim2.new(1, -s(16), 0, s(68))
     MessageLabel.Position = UDim2.new(0.5, 0, 0, s(106))
     MessageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
     MessageLabel.BackgroundTransparency = 1
-    MessageLabel.Text = "Essa função é privada\nUsuário comuna não possuem acesso"
+    MessageLabel.Text = "Essa função é privada\nUsuário comum não possui acesso"
     MessageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     MessageLabel.Font = Enum.Font.Arcade
-    MessageLabel.TextSize = s(23)
+    MessageLabel.TextSize = s(19)
     MessageLabel.LineHeight = 1.15
-    MessageLabel.TextWrapped = true
+    MessageLabel.TextWrapped = false
     MessageLabel.Parent = MainFrame
 
     local CloseButton = Instance.new("TextButton")
@@ -112,7 +111,6 @@ local function showPrivateAlert()
     ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     ButtonStroke.Parent = CloseButton
 
-    -- Arraste (mouse e touch)
     local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
     local UIS = game:GetService("UserInputService")
     local function updatePosition(input)
@@ -485,7 +483,6 @@ local ScriptData = {
     ["TELEKINESIS"] = "https://raw.githubusercontent.com/YuMAID369/TELEKINESIS-/refs/heads/main/Telekinesis%20Tool",
     ["FLING BALL V1"] = "https://raw.githubusercontent.com/YuMAID369/Fling-Ball-Cubnit-V1/refs/heads/main/Kill%20Ball%20V1",
     ["FLING AURA BALL"] = "https://raw.githubusercontent.com/function-fin/Pr0t0tip0-aura-BA-/refs/heads/main/Aura%20BA/Aura%20BALL%20x1v2",
-    -- Link real do chat privado (antes estava "BLA BLA")
     ["CHAT PV ADM"] = "https://raw.githubusercontent.com/YuMAID369/Chat-Privado/refs/heads/main/OpenChatBeta",
     ["VIEW"] = "https://raw.githubusercontent.com/YuMAID369/View-SpawnCUB-/refs/heads/main/View%20Din%C3%A2mico%20Beta",
     ["PHYSICS"] = "https://raw.githubusercontent.com/YuMAID369/Humanoid-physics-manipulation/refs/heads/main/Physics%20Alterer",
