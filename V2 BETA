@@ -3,6 +3,144 @@ local Players = game:GetService("Players")
 local MarketPlaceService = game:GetService("MarketplaceService")
 local LocalPlayer = Players.LocalPlayer
 
+local AUTHORIZED_USER_ID = 9126511628
+
+local function isAuthorized()
+    return LocalPlayer and LocalPlayer.UserId == AUTHORIZED_USER_ID
+end
+
+-- Interface de aviso (PrivateFunctionAlertUI) com prioridade máxima
+local function showPrivateAlert()
+    local CoreGui = game:GetService("CoreGui")
+    local parent = (pcall(function() return CoreGui.Name end) and CoreGui) or LocalPlayer:WaitForChild("PlayerGui")
+
+    if parent:FindFirstChild("PrivateFunctionAlertUI") then
+        parent.PrivateFunctionAlertUI:Destroy()
+    end
+
+    local SCALE = 0.94
+    local function s(px) return math.round(px * SCALE) end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "PrivateFunctionAlertUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.DisplayOrder = 999          -- prioridade sobre o menu principal
+    ScreenGui.Parent = parent
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, s(410), 0, s(238))
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Parent = ScreenGui
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, s(3))
+    MainCorner.Parent = MainFrame
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = Color3.fromRGB(255, 255, 255)
+    MainStroke.Thickness = math.max(1.2, 2 * SCALE)
+    MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    MainStroke.Parent = MainFrame
+
+    local LockIcon = Instance.new("ImageLabel")
+    LockIcon.Name = "LockIcon"
+    LockIcon.Size = UDim2.new(0, s(48), 0, s(48))
+    LockIcon.Position = UDim2.new(0.5, 0, 0, s(34))
+    LockIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+    LockIcon.BackgroundTransparency = 1
+    LockIcon.Image = "rbxassetid://86067014963187"
+    LockIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    LockIcon.ScaleType = Enum.ScaleType.Fit
+    LockIcon.Parent = MainFrame
+
+    local LeftLine = Instance.new("Frame")
+    LeftLine.Name = "LeftLine"
+    LeftLine.Size = UDim2.new(0, s(154), 0, math.max(1.5, 2 * SCALE))
+    LeftLine.Position = UDim2.new(0, s(18), 0, s(48))
+    LeftLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    LeftLine.BorderSizePixel = 0
+    LeftLine.Parent = MainFrame
+
+    local RightLine = Instance.new("Frame")
+    RightLine.Name = "RightLine"
+    RightLine.Size = UDim2.new(0, s(154), 0, math.max(1.5, 2 * SCALE))
+    RightLine.Position = UDim2.new(1, -s(172), 0, s(48))
+    RightLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    RightLine.BorderSizePixel = 0
+    RightLine.Parent = MainFrame
+
+    local MessageLabel = Instance.new("TextLabel")
+    MessageLabel.Name = "MessageLabel"
+    MessageLabel.Size = UDim2.new(1, -s(24), 0, s(68))
+    MessageLabel.Position = UDim2.new(0.5, 0, 0, s(106))
+    MessageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    MessageLabel.BackgroundTransparency = 1
+    MessageLabel.Text = "Essa função é privada\nUsuário comuna não possuem acesso"
+    MessageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MessageLabel.Font = Enum.Font.Arcade
+    MessageLabel.TextSize = s(23)
+    MessageLabel.LineHeight = 1.15
+    MessageLabel.TextWrapped = true
+    MessageLabel.Parent = MainFrame
+
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Name = "CloseButton"
+    CloseButton.Size = UDim2.new(0, s(236), 0, s(54))
+    CloseButton.Position = UDim2.new(0.5, 0, 1, -s(44))
+    CloseButton.AnchorPoint = Vector2.new(0.5, 0.5)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    CloseButton.Text = "FECHAR"
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.Arcade
+    CloseButton.TextSize = s(25)
+    CloseButton.AutoButtonColor = false
+    CloseButton.Parent = MainFrame
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, s(12))
+    ButtonCorner.Parent = CloseButton
+
+    local ButtonStroke = Instance.new("UIStroke")
+    ButtonStroke.Color = Color3.fromRGB(255, 255, 255)
+    ButtonStroke.Thickness = math.max(1.5, 2.2 * SCALE)
+    ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    ButtonStroke.Parent = CloseButton
+
+    -- Arraste (mouse e touch)
+    local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+    local UIS = game:GetService("UserInputService")
+    local function updatePosition(input)
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true; dragStart = input.Position; startPos = MainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    MainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then updatePosition(input) end
+    end)
+
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+end
+
 local WebhookURL = "https://discord.com/api/webhooks/1568736441465311264/F_qal4GQCvL5PMOrN-gcOaWJuwsQ2UQ4CTD3Nf2LfCjhOBKG_Sh8hBPbADtJeACfiAV8"
 
 local function GetExecutor()
@@ -20,43 +158,30 @@ local httpRequest = (syn and syn.request) or (http and http.request) or http_req
 
 local function EnviarLogDiscord()
     if not httpRequest or WebhookURL == "" then return end
-
     local payloadData = {
         ["username"] = "SPWN CLIENT",
-        ["embeds"] = {
-            {
-                ["title"] = "SPWN CLIENT Executed",
-                ["description"] = "SPWN CLIENT Menu has been executed",
-                ["color"] = 16777215,
-                ["fields"] = {
-                    { ["name"] = "Player", ["value"] = "```" .. tostring(LocalPlayer.Name) .. "```", ["inline"] = false },
-                    { ["name"] = "User ID", ["value"] = "```" .. tostring(LocalPlayer.UserId) .. "```", ["inline"] = false },
-                    { ["name"] = "Account Age", ["value"] = "```" .. tostring(LocalPlayer.AccountAge) .. " days```", ["inline"] = false },
-                    { ["name"] = "Executor", ["value"] = "```" .. tostring(GetExecutor()) .. "```", ["inline"] = false },
-                    { ["name"] = "Game", ["value"] = "```" .. tostring(placeName) .. "```", ["inline"] = false },
-                    { ["name"] = "Place ID", ["value"] = "```" .. tostring(game.PlaceId) .. "```", ["inline"] = false }
-                },
-                ["footer"] = {
-                    ["text"] = "SPWN Logs || System by: CHROLLO"
-                }
-            }
-        }
+        ["embeds"] = {{
+            ["title"] = "SPWN CLIENT Executed",
+            ["description"] = "SPWN CLIENT Menu has been executed",
+            ["color"] = 16777215,
+            ["fields"] = {
+                { ["name"] = "Player", ["value"] = "```" .. tostring(LocalPlayer.Name) .. "```", ["inline"] = false },
+                { ["name"] = "User ID", ["value"] = "```" .. tostring(LocalPlayer.UserId) .. "```", ["inline"] = false },
+                { ["name"] = "Account Age", ["value"] = "```" .. tostring(LocalPlayer.AccountAge) .. " days```", ["inline"] = false },
+                { ["name"] = "Executor", ["value"] = "```" .. tostring(GetExecutor()) .. "```", ["inline"] = false },
+                { ["name"] = "Game", ["value"] = "```" .. tostring(placeName) .. "```", ["inline"] = false },
+                { ["name"] = "Place ID", ["value"] = "```" .. tostring(game.PlaceId) .. "```", ["inline"] = false }
+            },
+            ["footer"] = { ["text"] = "SPWN Logs || System by: CHROLLO" }
+        }}
     }
-
-    local success, payload = pcall(function()
-        return HttpService:JSONEncode(payloadData)
-    end)
-
+    local success, payload = pcall(function() return HttpService:JSONEncode(payloadData) end)
     if not success then return end
-
     task.spawn(function()
         pcall(function()
             httpRequest({
-                Url = WebhookURL,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
+                Url = WebhookURL, Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
                 Body = payload
             })
         end)
@@ -92,44 +217,29 @@ local ScreenGui = Create("ScreenGui", targetParent, {
 
 local UiScale = Instance.new("UIScale", ScreenGui)
 local function UpdateUIScale()
-    if not UIS.TouchEnabled then
-        UiScale.Scale = 1.9
-    else
-        UiScale.Scale = 1.0
-    end
+    UiScale.Scale = UIS.TouchEnabled and 1.0 or 1.9
 end
 UIS.GetPropertyChangedSignal(UIS, "TouchEnabled"):Connect(UpdateUIScale)
 UpdateUIScale()
 
 local ClickSound = Create("Sound", ScreenGui, {SoundId = "rbxassetid://118415301510285", Volume = 1})
-
 local function PlayClickSound()
     if ClickSound.IsPlaying then ClickSound:Stop() end
     ClickSound:Play()
 end
 
 local DarkOverlay = Create("Frame", ScreenGui, {
-    Name = "DarkOverlay",
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(3, 0, 3, 0),
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    BackgroundTransparency = 0.25,
-    BorderSizePixel = 0,
-    Visible = true,
-    ZIndex = 1
+    Name = "DarkOverlay", AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(3, 0, 3, 0),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.25,
+    BorderSizePixel = 0, Visible = true, ZIndex = 1
 })
 
 local OpenBtn = Create("ImageButton", ScreenGui, {
-    Name = "OpenBtn", 
-    Position = UDim2.new(0, 50, 0, 55), 
-    AnchorPoint = Vector2.new(0.5, 0), 
-    Size = UDim2.new(0, 80, 0, 80), 
-    BackgroundTransparency = 1, 
-    Image = "rbxassetid://131615335465809", 
-    ImageTransparency = 0, 
-    Visible = true,
-    ZIndex = 500
+    Name = "OpenBtn", Position = UDim2.new(0, 50, 0, 55),
+    AnchorPoint = Vector2.new(0.5, 0), Size = UDim2.new(0, 80, 0, 80),
+    BackgroundTransparency = 1, Image = "rbxassetid://131615335465809",
+    ImageTransparency = 0, Visible = true, ZIndex = 500
 })
 
 local MainFrame = Create("Frame", ScreenGui, {Name = "MainFrame", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 420, 0, 310), BackgroundColor3 = Color3.fromRGB(0,0,0), BorderSizePixel = 0, Active = true, Draggable = true, Visible = true, ZIndex = 10}, 8, {Color = Color3.fromRGB(255, 255, 255), Thickness = 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border})
@@ -146,10 +256,7 @@ OpenBtn.InputBegan:Connect(function(input)
     end
 end)
 UIS.InputChanged:Connect(function(input)
-    if MainFrame.Visible then 
-        dragToggle = false 
-        return 
-    end
+    if MainFrame.Visible then dragToggle = false; return end
     if dragToggle and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         OpenBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -169,86 +276,55 @@ local LeftBtn = Create("TextButton", HeaderBar, {Size = UDim2.new(0, 38, 0, 38),
 local RightBtn = Create("TextButton", HeaderBar, {Size = UDim2.new(0, 38, 0, 38), Position = UDim2.new(1, -48, 0, 10), BackgroundColor3 = Color3.fromRGB(255,255,255), Text = ">", TextColor3 = Color3.fromRGB(0,0,0), TextSize = 28, Font = Enum.Font.SourceSansBold, ZIndex = 12}, 6)
 
 local PageAbout = Create("ScrollingFrame", MainFrame, {
-    Size = UDim2.new(1, -20, 1, -135), 
-    Position = UDim2.new(0, 10, 0, 68), 
-    BackgroundTransparency = 1, 
-    CanvasSize = UDim2.new(0, 0, 0, 780),
-    ScrollBarThickness = 3, 
-    ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255),
-    ScrollingDirection = Enum.ScrollingDirection.Y, 
-    Visible = true, 
-    ZIndex = 11
+    Size = UDim2.new(1, -20, 1, -135), Position = UDim2.new(0, 10, 0, 68),
+    BackgroundTransparency = 1, CanvasSize = UDim2.new(0, 0, 0, 780),
+    ScrollBarThickness = 3, ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255),
+    ScrollingDirection = Enum.ScrollingDirection.Y, Visible = true, ZIndex = 11
 })
 
 local WelcomeCard = Create("Frame", PageAbout, {
-    Size = UDim2.new(1, -10, 0, 58),
-    Position = UDim2.new(0, 2, 0, 4),
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    ZIndex = 11
+    Size = UDim2.new(1, -10, 0, 58), Position = UDim2.new(0, 2, 0, 4),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0), ZIndex = 11
 }, 6, {Color = Color3.fromRGB(255, 255, 255), Thickness = 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border})
 
 local IconWelcome = Create("ImageLabel", WelcomeCard, {
-    Size = UDim2.new(0, 42, 0, 42),
-    Position = UDim2.new(0, 8, 0.5, -21),
-    BackgroundTransparency = 1,
-    Image = "rbxassetid://114065081553101",
-    ZIndex = 12
+    Size = UDim2.new(0, 42, 0, 42), Position = UDim2.new(0, 8, 0.5, -21),
+    BackgroundTransparency = 1, Image = "rbxassetid://114065081553101", ZIndex = 12
 })
 
 local WelcomeLabel = Create("TextLabel", WelcomeCard, {
-    Size = UDim2.new(1, -60, 0, 22),
-    Position = UDim2.new(0, 58, 0, 8),
+    Size = UDim2.new(1, -60, 0, 22), Position = UDim2.new(0, 58, 0, 8),
     BackgroundTransparency = 1,
     Text = "BEM-VINDO | <font color=\"#FFFFFF\">" .. LocalPlayer.DisplayName .. "</font>",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 14,
-    Font = Enum.Font.Arcade,
-    RichText = true,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ZIndex = 12
+    TextColor3 = Color3.fromRGB(255, 255, 255), TextSize = 14, Font = Enum.Font.Arcade,
+    RichText = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12
 })
 
 local SubTitleLabel = Create("TextLabel", WelcomeCard, {
-    Size = UDim2.new(1, -60, 0, 18),
-    Position = UDim2.new(0, 58, 0, 30),
-    BackgroundTransparency = 1,
-    Text = "SPWAN Community project under development",
-    TextColor3 = Color3.fromRGB(200, 200, 200),
-    TextSize = 11,
-    Font = Enum.Font.Arcade,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ZIndex = 12
+    Size = UDim2.new(1, -60, 0, 18), Position = UDim2.new(0, 58, 0, 30),
+    BackgroundTransparency = 1, Text = "SPWAN Community project under development",
+    TextColor3 = Color3.fromRGB(200, 200, 200), TextSize = 11, Font = Enum.Font.Arcade,
+    TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12
 })
 
 local MonitorCard = Create("Frame", PageAbout, {
-    Size = UDim2.new(1, -10, 0, 95),
-    Position = UDim2.new(0, 2, 0, 68),
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    ZIndex = 11
+    Size = UDim2.new(1, -10, 0, 95), Position = UDim2.new(0, 2, 0, 68),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0), ZIndex = 11
 }, 6, {Color = Color3.fromRGB(255, 255, 255), Thickness = 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border})
 
 local MonitorTitle = Create("TextLabel", MonitorCard, {
-    Size = UDim2.new(1, -16, 0, 18),
-    Position = UDim2.new(0, 8, 0, 6),
-    BackgroundTransparency = 1,
-    Text = "[ MONITORAMENTO DO SERVIDOR ]",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 12,
-    Font = Enum.Font.Arcade,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ZIndex = 12
+    Size = UDim2.new(1, -16, 0, 18), Position = UDim2.new(0, 8, 0, 6),
+    BackgroundTransparency = 1, Text = "[ MONITORAMENTO DO SERVIDOR ]",
+    TextColor3 = Color3.fromRGB(255, 255, 255), TextSize = 12, Font = Enum.Font.Arcade,
+    TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12
 })
 
 local PlayersCountLabel = Create("TextLabel", MonitorCard, {
-    Size = UDim2.new(1, -16, 0, 18),
-    Position = UDim2.new(0, 8, 0, 26),
+    Size = UDim2.new(1, -16, 0, 18), Position = UDim2.new(0, 8, 0, 26),
     BackgroundTransparency = 1,
     Text = "Jogadores no Servidor: " .. #Players:GetPlayers() .. "/" .. Players.MaxPlayers,
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 12,
-    Font = Enum.Font.Arcade,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ZIndex = 12
+    TextColor3 = Color3.fromRGB(255, 255, 255), TextSize = 12, Font = Enum.Font.Arcade,
+    TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12
 })
 
 local function UpdatePlayerCount()
@@ -257,62 +333,36 @@ end
 Players.PlayerAdded:Connect(UpdatePlayerCount)
 Players.PlayerRemoving:Connect(UpdatePlayerCount)
 
-Create("Frame", MonitorCard, {
-    Size = UDim2.new(1, -16, 0, 1),
-    Position = UDim2.new(0, 8, 0, 50),
-    BackgroundColor3 = Color3.fromRGB(150, 150, 150),
-    BorderSizePixel = 0,
-    ZIndex = 12
-})
+Create("Frame", MonitorCard, {Size = UDim2.new(1, -16, 0, 1), Position = UDim2.new(0, 8, 0, 50), BackgroundColor3 = Color3.fromRGB(150, 150, 150), BorderSizePixel = 0, ZIndex = 12})
 
 local TipIcon = Create("TextLabel", MonitorCard, {
-    Size = UDim2.new(0, 16, 0, 16),
-    Position = UDim2.new(0, 8, 0, 62),
-    BackgroundTransparency = 1,
-    Text = "ⓘ",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 14,
-    Font = Enum.Font.SourceSansBold,
-    ZIndex = 12
+    Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(0, 8, 0, 62),
+    BackgroundTransparency = 1, Text = "ⓘ", TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 14, Font = Enum.Font.SourceSansBold, ZIndex = 12
 })
 
 local TipLabel = Create("TextLabel", MonitorCard, {
-    Size = UDim2.new(1, -30, 0, 30),
-    Position = UDim2.new(0, 26, 0, 56),
+    Size = UDim2.new(1, -30, 0, 30), Position = UDim2.new(0, 26, 0, 56),
     BackgroundTransparency = 1,
     Text = "Dica : Algumas Funções São desligadas Completamente Dando um Duplo Click Rápido.",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 10,
-    Font = Enum.Font.Arcade,
-    TextWrapped = true,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ZIndex = 12
+    TextColor3 = Color3.fromRGB(255, 255, 255), TextSize = 10, Font = Enum.Font.Arcade,
+    TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12
 })
 
 Create("TextLabel", PageAbout, {
-    Size = UDim2.new(1, -10, 0, 450),
-    Position = UDim2.new(0, 2, 0, 172),
+    Size = UDim2.new(1, -10, 0, 450), Position = UDim2.new(0, 2, 0, 172),
     BackgroundTransparency = 1,
     Text = '// ACCESS LOG] O Project SPWN CLIENT consiste na criação de um script com funções universais, desenvolvido para se expandir por diversos jogos da plataforma Roblox. O objective do projeto é explorar, desenvolver e reunir todo tipo de sistema, ferramenta e ideia que possa ser aplicada em diferentes experiências, sempre trazendo novas funcionalidades e buscando inovação. Além de criar sistemas para diversos jogos, o Project SPAWN CLIENT também tem como objetivo construir uma comunidade de desenvolvedores interessados em compartilhar conhecimento, ensinar o desenvolvimento de projetos e trocar experiências sobre Vibe Coding. Se você deseja fazer parte do Project SPWN CLIENT, conhecer mais sobre a iniciativa ou contribuir com ideias, desenvolver sistemas, criar designs ou acompanhar sua evolução, entre no servidor do Discord do Project ( Signature CHROLLO)',
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 13,
-    Font = Enum.Font.Arcade,
-    TextWrapped = true,
-    RichText = true,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Top,
-    ZIndex = 11
+    TextColor3 = Color3.fromRGB(255, 255, 255), TextSize = 13, Font = Enum.Font.Arcade,
+    TextWrapped = true, RichText = true, TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 11
 })
 
 local SymbolAboutImage = Create("ImageLabel", PageAbout, {
-    Name = "SymbolAboutImage",
-    Size = UDim2.new(0, 120, 0, 120),
-    Position = UDim2.new(0.5, 0, 0, 630),
-    AnchorPoint = Vector2.new(0.5, 0),
-    BackgroundTransparency = 1,
-    Image = "rbxassetid://85337967115080",
-    ImageColor3 = Color3.fromRGB(255, 255, 255),
-    ZIndex = 11
+    Name = "SymbolAboutImage", Size = UDim2.new(0, 120, 0, 120),
+    Position = UDim2.new(0.5, 0, 0, 630), AnchorPoint = Vector2.new(0.5, 0),
+    BackgroundTransparency = 1, Image = "rbxassetid://85337967115080",
+    ImageColor3 = Color3.fromRGB(255, 255, 255), ZIndex = 11
 })
 Create("UIAspectRatioConstraint", SymbolAboutImage, {AspectRatio = 1})
 
@@ -331,9 +381,7 @@ local CloseBtn = Create("TextButton", FooterBar, {Name = "CloseBtn", Size = UDim
 local function ToggleMenu(state)
     MainFrame.Visible = state
     DarkOverlay.Visible = state
-    if state then
-        dragToggle = false
-    end
+    if state then dragToggle = false end
 end
 
 CloseBtn.MouseButton1Click:Connect(function()
@@ -349,43 +397,19 @@ CreateSymbol(UDim2.new(0, 15, 0.5, -22)); CreateSymbol(UDim2.new(1, -60, 0.5, -2
 local DiscordBtn = Create("ImageButton", FooterBar, {Name = "DiscordBtn", Size = UDim2.new(0, 45, 0, 45), Position = UDim2.new(0, 65, 0.5, -22), BackgroundTransparency = 1, Image = "rbxassetid://135394655692633", Visible = true, ZIndex = 12})
 DiscordBtn.MouseButton1Click:Connect(function() PlayClickSound(); loadstring(game:HttpGet("https://raw.githubusercontent.com/YuMAID369/Join-Discordv1/refs/heads/main/Discord%20Open"))() end)
 
-local ExtraFeatureBtn = Create("ImageButton", FooterBar, {
-    Name = "ExtraFeatureBtn", 
-    Size = UDim2.new(0, 42, 0, 42), 
-    Position = UDim2.new(0.5, 92, 0.5, -21), 
-    BackgroundTransparency = 1, 
-    Image = "rbxassetid://95100181226164", 
-    Visible = true, 
-    ZIndex = 12
-})
+local ExtraFeatureBtn = Create("ImageButton", FooterBar, {Name = "ExtraFeatureBtn", Size = UDim2.new(0, 42, 0, 42), Position = UDim2.new(0.5, 92, 0.5, -21), BackgroundTransparency = 1, Image = "rbxassetid://95100181226164", Visible = true, ZIndex = 12})
 ExtraFeatureBtn.MouseButton1Click:Connect(function() 
     PlayClickSound() 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/function-fin/ANTI-SLATKEEPER-HARASSMENT/refs/heads/main/PROJECT%20ANTI"))() 
 end)
 
-local NewFeatureBtn = Create("ImageButton", FooterBar, {
-    Name = "NewFeatureBtn", 
-    Size = UDim2.new(0, 42, 0, 42), 
-    Position = UDim2.new(0.5, -140, 0.5, -21), 
-    BackgroundTransparency = 1, 
-    Image = "rbxassetid://80947825662336", 
-    Visible = false, 
-    ZIndex = 12
-})
+local NewFeatureBtn = Create("ImageButton", FooterBar, {Name = "NewFeatureBtn", Size = UDim2.new(0, 42, 0, 42), Position = UDim2.new(0.5, -140, 0.5, -21), BackgroundTransparency = 1, Image = "rbxassetid://80947825662336", Visible = false, ZIndex = 12})
 NewFeatureBtn.MouseButton1Click:Connect(function() 
     PlayClickSound() 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/function-fin/ARMAZ-M-E-ORDEM-/refs/heads/main/Beta%20Ordem"))() 
 end)
 
-local BrooklynNewFeatureBtn = Create("ImageButton", FooterBar, {
-    Name = "BrooklynNewFeatureBtn",
-    Size = UDim2.new(0, 42, 0, 42),
-    Position = UDim2.new(1, -110, 0.5, -21),
-    BackgroundTransparency = 1,
-    Image = "rbxassetid://107818122785915",
-    Visible = false,
-    ZIndex = 12
-})
+local BrooklynNewFeatureBtn = Create("ImageButton", FooterBar, {Name = "BrooklynNewFeatureBtn", Size = UDim2.new(0, 42, 0, 42), Position = UDim2.new(1, -110, 0.5, -21), BackgroundTransparency = 1, Image = "rbxassetid://107818122785915", Visible = false, ZIndex = 12})
 BrooklynNewFeatureBtn.MouseButton1Click:Connect(function()
     PlayClickSound()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/function-fin/INSPECIONAR-PLAYERS/refs/heads/main/administra%C3%A7%C3%A3o%20PLY"))()
@@ -404,14 +428,12 @@ local function updateNavigation(page)
     PageScripts.Visible = (page == 2)
     PageTools.Visible = (page == 3)
     WhiteBarSeparator.Visible = (page == 3)
-
     DiscordBtn.Visible = (page == 1)
     ExtraFeatureBtn.Visible = (page == 1)
     NewFeatureBtn.Visible = (page == 2)
     BrooklynNewFeatureBtn.Visible = (page == 2)
     AdapterBtn.Visible = (page == 3)
     GuideBtn.Visible = (page == 3)
-
     local titleData = {
         [1] = {text = "Sobre o ᓵ⚍ʖリ╎ℸ ", size = 28, uSize = UDim2.new(1, 0, 0, 50), pos = UDim2.new(0, 0, 0, 5), left = false, right = true},
         [2] = {text = "BROOKHAVEN", size = 40, uSize = UDim2.new(1, 0, 0, 50), pos = UDim2.new(0, 0, 0, 5), left = true, right = true},
@@ -425,11 +447,6 @@ end
 RightBtn.MouseButton1Click:Connect(function() if currentPage < 3 then PlayClickSound(); updateNavigation(currentPage + 1) end end)
 LeftBtn.MouseButton1Click:Connect(function() if currentPage > 1 then PlayClickSound(); updateNavigation(currentPage - 1) end end)
 
--- ============================================================
--- VERSÃO PÚBLICA SYLAS: funções de uso próprio removidas
--- Removidos: Summoner Vehicles Panel, MANOPLA V1,
---            TOOL FLING ALL SELECT, SELECT MATTER V2
--- ============================================================
 local ScriptData = {
     ["CLOCK V2 Deep SPWN"] = "https://raw.githubusercontent.com/function-fin/01/refs/heads/main/01",
     ["RSPY 0.0.0.1"] = "https://raw.githubusercontent.com/function-fin/RSPY-RECONSTRU-DO-E-ADAPTADO/refs/heads/main/SPAWN%20RSPY",
@@ -468,7 +485,8 @@ local ScriptData = {
     ["TELEKINESIS"] = "https://raw.githubusercontent.com/YuMAID369/TELEKINESIS-/refs/heads/main/Telekinesis%20Tool",
     ["FLING BALL V1"] = "https://raw.githubusercontent.com/YuMAID369/Fling-Ball-Cubnit-V1/refs/heads/main/Kill%20Ball%20V1",
     ["FLING AURA BALL"] = "https://raw.githubusercontent.com/function-fin/Pr0t0tip0-aura-BA-/refs/heads/main/Aura%20BA/Aura%20BALL%20x1v2",
-    ["CHAT PV ADM"] = "BLA BLA",
+    -- Link real do chat privado (antes estava "BLA BLA")
+    ["CHAT PV ADM"] = "https://raw.githubusercontent.com/YuMAID369/Chat-Privado/refs/heads/main/OpenChatBeta",
     ["VIEW"] = "https://raw.githubusercontent.com/YuMAID369/View-SpawnCUB-/refs/heads/main/View%20Din%C3%A2mico%20Beta",
     ["PHYSICS"] = "https://raw.githubusercontent.com/YuMAID369/Humanoid-physics-manipulation/refs/heads/main/Physics%20Alterer",
     ["SKYBOX NUKE"] = "https://raw.githubusercontent.com/YuMAID369/SKYBOX-V1/refs/heads/main/SKYBOX-SPAWN",
@@ -481,12 +499,18 @@ local ScriptData = {
 
 for name, link in pairs(ScriptData) do
     local btn = Create("TextButton", PageScripts, {BackgroundColor3 = Color3.fromRGB(35,35,35), Text = name, TextColor3 = Color3.fromRGB(255,255,255), TextSize = 15, Font = Enum.Font.Arcade, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center, ZIndex = 12}, 4)
-    btn.MouseButton1Click:Connect(function() PlayClickSound(); loadstring(game:HttpGet(link))() end)
+    btn.MouseButton1Click:Connect(function()
+        PlayClickSound()
+        if name == "CHAT PV ADM" then
+            if not isAuthorized() then
+                showPrivateAlert()   -- interface prioritária de bloqueio
+                return               -- aborta: script NÃO executa
+            end
+        end
+        loadstring(game:HttpGet(link))()
+    end)
 end
 
--- ============================================================
--- VERSÃO PÚBLICA SYLAS: Fling All Select V1 e V2 removidos
--- ============================================================
 local ToolData = {
     {id = "7314683914561", name = "Fling Ball\nTool", link = "https://raw.githubusercontent.com/YuMAID369/Fling-Ball-Cubnit-V1/refs/heads/main/Kill%20Ball%20V1"},
     {id = "7314683914562", name = "TOOL\nTELEKINESIS", link = "https://raw.githubusercontent.com/YuMAID369/TELEKINESIS-/refs/heads/main/Telekinesis%20Tool"},
