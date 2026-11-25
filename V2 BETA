@@ -452,6 +452,7 @@ local ScriptData = {
     ["Terminal Join Server"] = "https://raw.githubusercontent.com/YuMAID369/Terminal-Join-Server-SpwnCub-/refs/heads/main/SPWN%20Join",
     ["Sound ALL Beta"] = "https://raw.githubusercontent.com/function-fin/Sound-ALL-Project/refs/heads/main/Sound%20ALL",
     ["CLOCK CREATOR PROPs"] = "https://raw.githubusercontent.com/YuMAID369/CLOCK-Creator-Project-PROP-SPWN/refs/heads/main/CLOCK%20Creator%20Project%20PROP%20SPWN%20CLIENT%20V1",
+ ["SHIFT LOCK V1"] = "https://raw.githubusercontent.com/function-fin/SHIFT-LOCK-/refs/heads/main/V1",
     ["DELETE PLAYER Anti NUKE"] = "https://raw.githubusercontent.com/YuMAID369/Anti-PLAYER-/refs/heads/main/REMOVE%20PLAYER",
     ["HIDDEN LIBRARY SPWN"] = "https://raw.githubusercontent.com/YuMAID369/Bloco-de-Notas-SpawnCUB/refs/heads/main/Notebook%20Notes",
     ["Cronômetro V1"] = "https://raw.githubusercontent.com/YuMAID369/Cron-metro-Spwn-v1/refs/heads/main/00%3A00%3A00",
