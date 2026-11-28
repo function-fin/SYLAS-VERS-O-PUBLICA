@@ -456,6 +456,7 @@ local ScriptData = {
     ["HIDDEN LIBRARY SPWN"] = "https://raw.githubusercontent.com/YuMAID369/Bloco-de-Notas-SpawnCUB/refs/heads/main/Notebook%20Notes",
     ["Cronômetro V1"] = "https://raw.githubusercontent.com/YuMAID369/Cron-metro-Spwn-v1/refs/heads/main/00%3A00%3A00",
     ["ENTER ID#"] = "https://raw.githubusercontent.com/YuMAID369/ENTER-ID-/refs/heads/main/ENTER%20ID%23%20000",
+["ESP."] = "https://raw.githubusercontent.com/function-fin/ESP/refs/heads/main/V1",
     ["CALCULATOR STUDIES"] = "https://raw.githubusercontent.com/function-fin/Roblox-Studs-Calculator-Beta/refs/heads/main/STUDS%20Calculecter0.0.0.0.1",
     ["SPWAN Coordinates"] = "https://raw.githubusercontent.com/YuMAID369/Coordenadas-Ui-/refs/heads/main/Coordenadas%20SPWN%20V1",
     ["Vehicle Speed Upgrade"] = "https://raw.githubusercontent.com/function-fin/Ve-culo-Upgrade-Turbo-/refs/heads/main/Vehicle%20S",
